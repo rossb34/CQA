@@ -1,0 +1,9 @@
+Package: CQA
+Type: Package
+Title: Package for CQA Investment Challenge
+Version: 1.0
+Date: 2013-10-27
+Author: Ross Bennett
+Maintainer: Ross Bennett <rossbennett34@gmail.com>
+Description: Collection of functions for the CQA Investment Challenge 
+License: GPL
