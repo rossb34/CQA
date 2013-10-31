@@ -5,5 +5,15 @@ Version: 1.0
 Date: 2013-10-27
 Author: Ross Bennett
 Maintainer: Ross Bennett <rossbennett34@gmail.com>
-Description: Collection of functions for the CQA Investment Challenge 
+Description: Collection of functions for the CQA Investment Challenge
+Depends:
+    R (>= 2.15.0),
+    zoo,
+    xts (>= 0.8),
+    PerformanceAnalytics (>= 1.0.0),
+    quantmod,
+    TTR
 License: GPL
+Collate:
+    'returns.R'
+    'random_filter.R'
