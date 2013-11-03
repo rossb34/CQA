@@ -18,3 +18,4 @@ Collate:
     'returns.R'
     'random_filter.R'
     'loadStocks.R'
+    'portfolioReturns.R'

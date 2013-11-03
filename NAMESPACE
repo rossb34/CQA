@@ -1,3 +1,5 @@
 export(calculateReturns)
 export(loadStocks)
+export(portfolioRebalancingReturns)
+export(portfolioReturn)
 export(randomFilter)

@@ -52,19 +52,6 @@ symbols <- data[, "Symbol"]
 dir <- "~/Documents/tmp/data/"
 loadStocks(stocks=symbols, data.dir=dir, format="%Y-%m-%d", sep=",", header=TRUE)
 
-# Get the start date of each symbol
-startDates <- rep(0, length(symbols))
-for(i in 1:length(symbols)){
-  startDates[i] <- start(get(symbols[i]))
-}
-startDates <- as.Date(startDates)
-names(startDates) <- symbols
-
-# Should I filter here based on available data?
-# This returns a character vector of symbols with start dates earlier than
-# the specified date
-# names(startDates[startDates <= as.Date("2000-01-01")])
-
 # Any stock that can't have returns calculated will be printed out
 # Issues with T and F stocks, this is likely due to how R handles T=TRUE and F=FALSE
 
