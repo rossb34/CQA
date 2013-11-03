@@ -1,6 +1,7 @@
 library(quantMod)
 
 BetaValues2013 <- read.csv("/Users/rossbennett/devel/R/CQA/rawData/BetaValues2013.csv", header=TRUE, as.is=TRUE)
+colnames(BetaValues2013) <- c("Symbol", "Name", "Type", "Value", "Market", "Industry", "Unit")
 save(BetaValues2013, file="data/BetaValues2013.Rda")
 # load("data/BetaValues2013.Rda")
 

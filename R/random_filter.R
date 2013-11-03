@@ -19,7 +19,7 @@ randomFilter <- function(symbols, min.stocks=50, max.stocks=100){
   n.stocks <- length(symbols)
   
   # index of stocks to select
-  tmp.idx <- sample(n.stocks, n.select)
+  tmp.idx <- sample(x=1:n.stocks, size=n.select)
   
   # character vector of randomly selected symbols (duplicates are removed)
   selected.stocks <- symbols[tmp.idx[!duplicated(tmp.idx)]]

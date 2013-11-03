@@ -16,12 +16,18 @@ calculateReturns <- function(symbols, type="discrete", ...){
   for(i in 1:n.symbols){
     x <- try(get(symbols[i]), silent=TRUE)
     if(inherits(x, "try-error")) stop(paste(symbols[i], "not detected."))
-    x.ret <- ROC(x=Ad(x), n=1, type=type, ...)
-    colnames(x.ret) <- symbols[i]
-    if(i == 1){
-      out.ret <- x.ret
+    tmp.x <- try(Ad(x), silent=TRUE)
+    if(!inherits(tmp.x, "try-error")) {
+      x.ret <- ROC(x=tmp.x, n=1, type=type, ...)
+      colnames(x.ret) <- symbols[i]
+      if(i == 1){
+        out.ret <- x.ret
+      } else {
+        out.ret <- cbind(out.ret, x.ret)
+      }
     } else {
-      out.ret <- cbind(out.ret, x.ret)
+      warning(tmp.x)
+      print(symbols[i])
     }
   }
   return(out.ret)

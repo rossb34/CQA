@@ -17,3 +17,4 @@ License: GPL
 Collate:
     'returns.R'
     'random_filter.R'
+    'loadStocks.R'
