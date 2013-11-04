@@ -135,6 +135,9 @@ xxdfTech[which.max(xxdfTech[, "mean"]),]
 plot(x=xxdfTech[-35, "sd"], y=xxdfTech[-35, "mean"], xlab="Annualized StdDev", ylab="Annualized Geometric Mean")
 text(x=xxdfTech[-35, "sd"], y=xxdfTech[-35, "mean"], labels=xxdfTech[-35, "Symbol"], pos=4, cex=0.6)
 
+plot(x=xxdfTech[-35, "ES"], y=xxdfTech[-35, "mean"], xlab="Annualized StdDev", ylab="Annualized Geometric Mean")
+text(x=xxdfTech[-35, "ES"], y=xxdfTech[-35, "mean"], labels=xxdfTech[-35, "Symbol"], pos=4, cex=0.6)
+
 # get the names of the stocks in each industry
 industries <- unique(data[, "Industry"])
 

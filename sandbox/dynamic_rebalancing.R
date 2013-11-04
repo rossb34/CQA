@@ -20,13 +20,15 @@ data(BetaValues2013)
 data <- BetaValues2013[!is.na(BetaValues2013[, "Value"]), ]
 rm(BetaValues2013)
 
-symbols <- data[, "Symbol"][1:50]
+symbols <- data[, "Symbol"][1:10]
 
 # We should have a table with symbol data that keeps track of, for example,
 # the first available date of history
 
 dir <- "~/Documents/tmp/data/"
 loadStocks(stocks=symbols, data.dir=dir, format="%Y-%m-%d", sep=",", header=TRUE)
+
+head(na.omit(combinePrices(symbols)))
 
 # Get the start date of each symbol
 startDates <- rep(0, length(symbols))

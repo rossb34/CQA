@@ -1,3 +1,12 @@
+
+#' Calculate portfolio returns 
+#' 
+#' This function calculates portfolio returns based on a single set of weights.
+#' 
+#' @param R xts object of returns
+#' @param weights vector of weights
+#' @param show.weights TRUE/FALSE to show the weights at each period
+#' @return xts object of portfolio returns
 #' @export
 portfolioReturn <- function(R, weights, show.weights=FALSE){
   # equivalent to geometric return for positive and negative weights
@@ -35,6 +44,18 @@ portfolioReturn <- function(R, weights, show.weights=FALSE){
   }
 }
 
+#' Calculate returns of a rebalanced portfolio
+#' 
+#' This function calculates returns of a rebalanced portfolio based on a list
+#' of weights at each rebalance period. This function is primarily to work with
+#' the dynamic rebalancing strategy. A different function may need to be used
+#' with a standard optimize.portfolio.rebalancing object from PortfolioAnalytics.
+#' 
+#' @param R xts object of asset returns
+#' @param weights named list of weights where the names of the list are the
+#' rebalancing dates
+#' @param show.weights TRUE/FALSE to show the weights at each period
+#' @return xts object of portfolio returns
 #' @export
 portfolioRebalancingReturns <- function(R, weights, show.weights=FALSE){
   # equation for w_i,_(t+1) from
