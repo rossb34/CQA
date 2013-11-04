@@ -19,3 +19,4 @@ Collate:
     'random_filter.R'
     'loadStocks.R'
     'portfolioReturns.R'
+    'prices.R'
