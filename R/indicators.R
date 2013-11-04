@@ -108,6 +108,7 @@ priceToHILO <- function(prices, n=252, lag=1){
 #' @param n number of periods to use for moving average
 #' @return Current close price percentage above or below the EMA. Only returns 
 #' the most recent observation.
+#' @export
 priceToEMA <- function(prices, n=252){
   tmpEMA <- apply(X=tail(prices, n), MARGIN=2, FUN=EMA, n=n)
   out <- as.numeric(last(prices)) / as.numeric(last(tmpEMA)) - 1

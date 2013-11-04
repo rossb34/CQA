@@ -11,10 +11,11 @@ library(PortfolioAnalytics)
 # The multicore package, and therefore registerDoMC, should not be used in a
 # GUI environment, because multiple processes then share the same GUI. Only use
 # when running from the command line.
-# require(doMC)
-# registerDoMC(3)
+require(doMC)
+registerDoMC(3)
 
 data(BetaValues2013)
+data(startDates)
 
 # Remove all rows that have an NA for beta values
 data <- BetaValues2013[!is.na(BetaValues2013[, "Value"]), ]
@@ -23,21 +24,13 @@ rm(BetaValues2013)
 # list of all symbols in the data
 symbols <- data[, "Symbol"]
 
-dir <- "~/Documents/tmp/data/"
-loadStocks(stocks=symbols, data.dir=dir, format="%Y-%m-%d", sep=",", header=TRUE)
-
-# Get the start date of each symbol
-startDates <- rep(0, length(symbols))
-for(i in 1:length(symbols)){
-  startDates[i] <- start(get(symbols[i]))
-}
-startDates <- as.Date(startDates)
-names(startDates) <- symbols
-
-
 # This returns a character vector of symbols with start dates earlier than
 # the specified date
 tmpSymbols <- names(startDates[startDates <= as.Date("2000-01-01")])
+
+dir <- "~/Documents/tmp/data/"
+loadStocks(stocks=tmpSymbols, data.dir=dir, format="%Y-%m-%d", sep=",", header=TRUE)
+
 
 # This calculates the single period (i.e. daily) returns
 retAll <- na.omit(calculateReturns(tmpSymbols))
@@ -48,7 +41,7 @@ retAll <- na.omit(calculateReturns(tmpSymbols))
 returns <- retAll
 
 # Define the training period
-trainingPeriods <- 750
+trainingPeriods <- 756
 
 # Define the rebalance freqency
 rebalanceFrequency <- "months"
@@ -112,18 +105,20 @@ optList <- foreach(ep=iter(ep.i), .errorhandling='pass', .packages='PortfolioAna
   
   # Run the optimization
   optList[[i]] <- optimize.portfolio(R=R, portfolio=init.portf, optimize_method="ROI", trace=TRUE)
-  cat("Completed optimization for rebalance period", i, "\n")
+  print(paste("Completed optimization for rebalance period", i))
 }
 names(optList) <- index(returns[ep.i])
+
+save(optList, file="optList.rda")
 
 # Each rebalance period may have different assets so we need to consider this
 # when calculating the returns
 weights <- lapply(optList, function(x) x$weights)
-weights
+# weights
 
 # Portfolio returns through time with rebalancing
 ret <- portfolioRebalancingReturns(R=returns, weights=weights)
-charts.PerformanceSummary(ret)
+# charts.PerformanceSummary(ret)
 
 
 #

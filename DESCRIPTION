@@ -20,3 +20,4 @@ Collate:
     'loadStocks.R'
     'portfolioReturns.R'
     'prices.R'
+    'indicators.R'
