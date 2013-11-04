@@ -49,11 +49,24 @@ simpleStrength <- function(prices, n=252){
 #' @export
 emaMomentum <- function(prices, nROC=252, nEMA=50){
   tmpROC <- ROC(x=prices, n=nROC, type="discrete")
-  emaROC <- apply(X=tmpROC, MARGIN=2, FUN=EMA, n=nEMA)
-  out <- as.numeric(tail(emaROC, 1))
-  names(out) <- colnames(prices)
-  return(out)
+  emaROC2 <- vector("numeric", length=ncol(tmpROC))
+  for(i in 1:ncol(tmpROC)){
+    # only calculate based on the nROC most recent observations of tmpROC
+    emaROC2[i] <- as.numeric(last(EMA(x=tail(tmpROC[,i], nROC), n=nEMA)))
+  }
+  names(emaROC2) <- colnames(prices)
+  return(emaROC2)
 }
+
+# emaMomentum <- function(prices, nROC=252, nEMA=50){
+#   tmpROC <- ROC(x=prices, n=nROC, type="discrete")
+#   emaROC <- apply(X=tmpROC, MARGIN=2, FUN=EMA, n=nEMA)
+#   out <- as.numeric(tail(emaROC, 1))
+#   names(out) <- colnames(prices)
+#   return(out)
+# }
+
+
 
 #' Smoothed Momentum Strength
 #' 
@@ -84,18 +97,26 @@ emaStrength <- function(prices, nROC=252, nEMA=50, nSD=252){
 #' @param n number of lookback periods
 #' @param lag number of periods to lag for the n-period high and low. A value
 #' of lag=1 means the high and low are calculated as of the previous period.
+#' @param HI.only default FALSE. Optionally, only return the current price 
+#' relative to the n-period high close
 #' @return a list with two elements; HI (percent from n-period high) and 
-#' LO (percent from n-period low). Only returns the most recent observation.
+#' LO (percent from n-period low). If HI.only=TRUE, only the current price 
+#' relative to the n-period high close will be returned. The most 
+#' recent observation is returned.
 #' @export
-priceToHILO <- function(prices, n=252, lag=1){
+priceToHILO <- function(prices, n=252, lag=1, HI.only=FALSE){
   nPrices <- nrow(prices)
   # calculate the n day high and low as of the lagged period
   tmpP <- prices[(nPrices-n-lag):(nPrices-lag)]
   tmpMax <- apply(X=tmpP, MARGIN=2, FUN=max)
-  tmpMin <- apply(X=tmpP, MARGIN=2, FUN=min)
   HI <- prices[nPrices] / tmpMax - 1
-  LO <- prices[nPrices] / tmpMin - 1
-  return(list(HI=HI, LO=LO))
+  if(HI.only){
+    return(HI)
+  } else {
+    tmpMin <- apply(X=tmpP, MARGIN=2, FUN=min)
+    LO <- prices[nPrices] / tmpMin - 1
+    return(list(HI=HI, LO=LO))
+  }
 }
 
 #' Price To EMA
@@ -110,8 +131,12 @@ priceToHILO <- function(prices, n=252, lag=1){
 #' the most recent observation.
 #' @export
 priceToEMA <- function(prices, n=252){
-  tmpEMA <- apply(X=tail(prices, n), MARGIN=2, FUN=EMA, n=n)
-  out <- as.numeric(last(prices)) / as.numeric(last(tmpEMA)) - 1
+  # tmpEMA <- apply(X=tail(prices, n), MARGIN=2, FUN=EMA, n=n)
+  out <- vector("numeric", ncol(prices))
+  for(i in 1:ncol(prices)){
+    tmpEMA <- last(EMA(x=tail(prices[,i], n*2), n=n))
+    out[i] <- as.numeric(last(prices[,i])) / as.numeric(tmpEMA) - 1
+  }
   names(out) <- colnames(prices)
   return(out)
 }

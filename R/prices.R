@@ -14,9 +14,28 @@ combinePrices <- function(symbols) {
   # symbols         : character vector of symbols
   # list.sym        : list of symbols with market data
   
-  list.sym <- list()
-  for(i in 1:length(symbols)) {
-    list.sym[[symbols[i]]] <- get(symbols[i])
+  # list.sym <- list()
+  # for(i in 1:length(symbols)) {
+  #   list.sym[[symbols[i]]] <- get(symbols[i])
+  # }
+  # do.call(merge, lapply(list.sym, Ad))
+  n.symbols <- length(symbols)
+  for(i in 1:n.symbols){
+    x <- try(get(symbols[i]), silent=TRUE)
+    if(inherits(x, "try-error")) stop(paste(symbols[i], "not detected."))
+    tmp.x <- try(Ad(x), silent=TRUE)
+    if(!inherits(tmp.x, "try-error")) {
+      # x.ret <- ROC(x=tmp.x, n=1, type=type, ...)
+      # colnames(x.ret) <- symbols[i]
+      if(i == 1){
+        out <- tmp.x
+      } else {
+        out <- cbind(out, tmp.x)
+      }
+    } else {
+      warning(tmp.x)
+      print(symbols[i])
+    }
   }
-  do.call(merge, lapply(list.sym, Ad))
+  return(out)
 }

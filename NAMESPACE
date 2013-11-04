@@ -1,3 +1,4 @@
+export(backtestMomentum)
 export(calculateReturns)
 export(combinePrices)
 export(emaMomentum)

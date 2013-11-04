@@ -15,9 +15,9 @@ portfolioReturn <- function(R, weights, show.weights=FALSE){
   # http://www.slideshare.net/andsteinconsult/correct-calculation-of-ex-post-
   # contributions-to-return-volatility-and-tracking-error
   
-  if(isTRUE(nrow(weights) > 1)) stop("This function is only used for calculating
-                             portfolio returns given a single period 
-                             weights vector")
+#   if(isTRUE(nrow(weights) > 1)) stop("This function is only used for calculating
+#                              portfolio returns given a single period 
+#                              weights vector")
   
   # weights <- checkData(weights, method = "xts")
   R <- checkData(R, method = "xts")

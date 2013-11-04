@@ -21,3 +21,4 @@ Collate:
     'portfolioReturns.R'
     'prices.R'
     'indicators.R'
+    'backtest.R'
