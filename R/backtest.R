@@ -14,7 +14,7 @@
 #' @param \dots passthru parameters to FUN
 #' @return a list with the weights and portfolio returns
 #' @export
-backtestMomentum <- function(prices, trainingPeriods=252, trailingPeriods=252, rebalanceFrequency="months", N=20, FUN, ..., verbose=FALSE){
+backtestMomentum <- function(prices, trainingPeriods=252, trailingPeriods=252, rebalanceFrequency="months", N=20, FUN, ..., multiplier=1, verbose=FALSE){
   nAssets <- ncol(prices)
   nObs <- nrow(prices)
   
@@ -38,9 +38,9 @@ backtestMomentum <- function(prices, trainingPeriods=252, trailingPeriods=252, r
     
     tmpMeasure <- try(do.call(fun, dargs), silent=TRUE)
     if(inherits(x=tmpMeasure, "try-error")) stop(paste("Failed calling", fun, ";", tmpMeasure))
-    
+        
     # tmpMeasure <- emaStrength(prices=prices[(ifelse(ep - trailingPeriods >= 1, ep - trailingPeriods, 1)):ep, ], nROC=200, nEMA=50, nSD=200)
-    tmpMeasure <- tmpMeasure[order(tmpMeasure, decreasing=TRUE)]
+    tmpMeasure <- tmpMeasure[order(tmpMeasure, decreasing=TRUE, na.last=NA)]
     
     p <- length(tmpMeasure)
     topN <- tmpMeasure[1:(N/2)]
@@ -52,10 +52,24 @@ backtestMomentum <- function(prices, trainingPeriods=252, trailingPeriods=252, r
     
     if(verbose) print(paste("Completed backtest for rebalance period", index(prices[ep])))
     
-    c(longWeights, shortWeights)
+    c(longWeights, shortWeights) * multiplier
   }
   names(optList) <- index(prices[ep.i])
   # Portfolio returns through time with rebalancing
   # ret <- portfolioRebalancingReturns(R=ROC(x=prices, n=1, type="discrete"), weights=optList)
   return(optList)
 }
+
+# Loop without a trailing period
+# without trailing periods, start is the beginning of the data
+# for(i in 1:length(ep.i)){
+#   # subset the returns data to the periods I want
+#   tmpR <- tmp[1:ep.i[i], ]
+#   print(start(tmpR))
+#   print(end(tmpR))
+#   print("*****")
+#   tmpES <- apply(X=tmpR, MARGIN=2, FUN=ES, method="historical", p=0.95, invert=FALSE)
+#   print(head(tmpR[, order(tmpES)[1:4]]))
+#   print(tail(tmpR[, order(tmpES)[1:4]]))
+#   print("*****")
+# }

@@ -4,7 +4,7 @@
 \usage{
   backtestMomentum(prices, trainingPeriods = 252,
     trailingPeriods = 252, rebalanceFrequency = "months",
-    N = 20, FUN, ...)
+    N = 20, FUN, ..., multiplier = 1, verbose = FALSE)
 }
 \arguments{
   \item{prices}{xts object of prices}

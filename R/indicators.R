@@ -12,7 +12,9 @@ simpleMomentum <- function(prices, n=252){
   nPrices <- nrow(prices)
   # n must be less than the total number of periods of data
   n <- min(nPrices, n)
-  return(prices[nPrices] / as.numeric(prices[(nPrices-n),]) - 1)
+  out <- as.numeric(prices[nPrices]) / as.numeric(prices[(nPrices-n),]) - 1
+  names(out) <- colnames(prices)
+  return(out)
 }
 
 #' Smoothed Momentum Strength
@@ -34,7 +36,9 @@ simpleStrength <- function(prices, n=252){
   # calculate the one-period returns used for sd 
   tmpROC <- ROC(x=tail(prices, n+1), n=1, type="discrete")
   tmpSD <- apply(tmpROC, MARGIN=2, FUN=sd, na.rm=TRUE)
-  return(nROC / tmpSD)
+  out <- as.numeric(nROC / tmpSD)
+  names(out) <- colnames(prices)
+  return(out)
 }
 
 #' Smoothed Momentum
@@ -109,7 +113,8 @@ priceToHILO <- function(prices, n=252, lag=1, HI.only=FALSE){
   # calculate the n day high and low as of the lagged period
   tmpP <- prices[(nPrices-n-lag):(nPrices-lag)]
   tmpMax <- apply(X=tmpP, MARGIN=2, FUN=max)
-  HI <- prices[nPrices] / tmpMax - 1
+  HI <- as.numeric(prices[nPrices] / tmpMax - 1)
+  names(HI) <- colnames(prices)
   if(HI.only){
     return(HI)
   } else {

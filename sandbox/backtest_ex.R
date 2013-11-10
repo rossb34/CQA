@@ -10,35 +10,8 @@ library(iterators)
 # The multicore package, and therefore registerDoMC, should not be used in a
 # GUI environment, because multiple processes then share the same GUI. Only use
 # when running from the command line.
-require(doMC)
-registerDoMC(3)
-
-data(BetaValues2013)
-data(startDates)
-
-# Remove all rows that have an NA for beta values
-data <- BetaValues2013[!is.na(BetaValues2013[, "Value"]), ]
-rm(BetaValues2013)
-
-# list of all symbols in the data
-symbols <- data[, "Symbol"]
-
-# This returns a character vector of symbols with start dates earlier than
-# the specified date
-tmpSymbols <- names(startDates[startDates <= as.Date("2000-01-01")])
-
-dir <- "~/Documents/tmp/data/"
-loadStocks(stocks=tmpSymbols, data.dir=dir, format="%Y-%m-%d", sep=",", header=TRUE)
-
-
-# This calculates the single period (i.e. daily) returns
-# retAll <- na.omit(calculateReturns(tmpSymbols))
-# head(retAll)
-
-prices <- na.omit(combinePrices(tmpSymbols))
-# prices <- prices["2010/2013"]
-
-# returns <- na.omit(ROC(prices, 1, "discrete"))
+# require(doMC)
+# registerDoMC(3)
 
 
 ##### Parameters for dynamic rebalancing optimization #####
@@ -50,7 +23,7 @@ trainingPeriods <- 1512
 rebalanceFrequency <- "months"
 
 # Number of stocks to use for optimization
-N <- 80
+N <- 140
 
 # Define the trailing periods
 # 1260 is approximately 5 years. This means I always use the most recent 5 
@@ -63,11 +36,15 @@ btPriceToEMA <- backtestMomentum(prices=prices,
                                  rebalanceFrequency=rebalanceFrequency, 
                                  N=N, 
                                  FUN=priceToEMA, 
-                                 n=252)
+                                 n=126,
+                                 multiplier=-1)
 
-save(btPriceToEMA, file=paste("btPriceToEMA.", Sys.Date(), ".rda", sep=""))
+retPriceToEMA <- portfolioRebalancingReturns(R=returns, weights=btPriceToEMA)
+
+# save(btPriceToEMA, file=paste("btPriceToEMA.", Sys.Date(), ".rda", sep=""))
 
 print(paste("Completed riceToEMA backtest at", Sys.time()))
+
 
 btPriceToHILO <- backtestMomentum(prices=prices, 
                                   trainingPeriods=trainingPeriods, 
@@ -75,10 +52,13 @@ btPriceToHILO <- backtestMomentum(prices=prices,
                                   rebalanceFrequency=rebalanceFrequency, 
                                   N=N, 
                                   FUN=priceToHILO, 
-                                  n=252,
-                                  HI.only=TRUE)
+                                  n=126,
+                                  HI.only=TRUE,
+                                  multiplier=-1)
 
-save(btPriceToHILO, file=paste("btPriceToHILO", Sys.Date(), ".rda", sep=""))
+retPriceToHILO <- portfolioRebalancingReturns(R=returns, weights=btPriceToHILO)
+
+# save(btPriceToHILO, file=paste("btPriceToHILO", Sys.Date(), ".rda", sep=""))
 
 print(paste("Completed riceToHILO backtest at", Sys.time()))
 
@@ -88,10 +68,13 @@ btemaMom <- backtestMomentum(prices=prices,
                              rebalanceFrequency=rebalanceFrequency, 
                              N=N, 
                              FUN=emaMomentum, 
-                             nROC=252,
-                             nEMA=50)
+                             nROC=126,
+                             nEMA=50,
+                             multiplier=-1)
 
-save(btemaMom, file=paste("btemaMom", Sys.Date(), ".rda", sep=""))
+retemaMom <- portfolioRebalancingReturns(R=returns, weights=btemaMom)
+
+# save(btemaMom, file=paste("btemaMom", Sys.Date(), ".rda", sep=""))
 
 print(paste("Completed emaMomentum backtest at", Sys.time()))
 
@@ -101,24 +84,19 @@ btsimpleStrength <- backtestMomentum(prices=prices,
                                      rebalanceFrequency=rebalanceFrequency, 
                                      N=N, 
                                      FUN=simpleStrength, 
-                                     n=252)
+                                     n=126,
+                                     multiplier=-1)
 
-save(btsimpleStrength, file=paste("btsimpleStrength", Sys.Date(), ".rda", sep=""))
+retsimpleStrength <- portfolioRebalancingReturns(R=returns, weights=btsimpleStrength)
+
+# save(btsimpleStrength, file=paste("btsimpleStrength", Sys.Date(), ".rda", sep=""))
 
 print(paste("Completed simpleStrength backtest at", Sys.time()))
 
 print("All optimizations complete")
 
-# Loop without a trailing period
-# without trailing periods, start is the beginning of the data
-# for(i in 1:length(ep.i)){
-#   # subset the returns data to the periods I want
-#   tmpR <- tmp[1:ep.i[i], ]
-#   print(start(tmpR))
-#   print(end(tmpR))
-#   print("*****")
-#   tmpES <- apply(X=tmpR, MARGIN=2, FUN=ES, method="historical", p=0.95, invert=FALSE)
-#   print(head(tmpR[, order(tmpES)[1:4]]))
-#   print(tail(tmpR[, order(tmpES)[1:4]]))
-#   print("*****")
-# }
+ret <- cbind(retPriceToEMA, retPriceToHILO, retemaMom, retsimpleStrength)
+colnames(ret) <- c("PriceToEMA", "PriceToHILO", "emaMom", "SimpleStrength")
+
+charts.PerformanceSummary(ret, main="Technical Indicators Backtest")
+

@@ -1,4 +1,5 @@
 library(quantmod)
+library(CQA)
 
 # load the data for the beta values
 data(BetaValues2013)
