@@ -12,7 +12,9 @@ Depends:
     xts (>= 0.8),
     PerformanceAnalytics (>= 1.0.0),
     quantmod,
-    TTR
+    TTR,
+    tseries,
+    urca
 License: GPL
 Collate:
     'returns.R'
@@ -22,3 +24,6 @@ Collate:
     'prices.R'
     'indicators.R'
     'backtest.R'
+    'estimate_parameters.R'
+    'hedge_ratios.R'
+    'stationary_coint_tests.R'

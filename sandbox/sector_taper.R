@@ -20,23 +20,33 @@ sector.returns <- cbind(sector.returns, SPY.ret)
 
 # The first taper announcement came on 5/22/2013
 # Evaluate performance for the following month
-tmp.ret <- sector.returns['2013-05-21/2013-06-21']
+# tmp.ret <- sector.returns['2013-05-21/2013-06-21']
+tmp.ret <- sector.returns['2013']
 # head(tmp.ret)
 
+
+
 # Calendar Returns for each sector ETF
-monthly.ret <- list()
-tmp_names <- colnames(sector.returns)
-for(i in 1:ncol(sector.returns)){
-  monthly.ret[[tmp_names[i]]] <- table.CalendarReturns(sector.returns[, i], 2, TRUE, TRUE)
-}
+# monthly.ret <- list()
+# tmp_names <- colnames(sector.returns)
+# for(i in 1:ncol(sector.returns)){
+#   monthly.ret[[tmp_names[i]]] <- table.CalendarReturns(sector.returns[, i], 2, TRUE, TRUE)
+# }
 
 # Cumulative return over this period
 ret.cum <- apply(tmp.ret, 2, function(x) prod(1 + x) - 1)
-sort(ret.cum[ret.cum <= -0.1])
+sort(ret.cum)
 ret.cum[ret.cum >= 0]
 
+which(ret.cum <= 0.02)
+
+barcol <- rep("gray", length(ret.cum))
+
+date.range <- "2013"
+
 barplot(ret.cum, las=3, cex.names=0.6, 
-        main="Sector Performance\n2013-05-21 to 2013-06-21")
+        main=paste("Sector Performance\n", date.range),
+        col=barcol)
 
 worst_names <- names(sort(ret.cum[ret.cum <= -0.1]))
 
@@ -52,7 +62,7 @@ worst_names <- names(sort(ret.cum[ret.cum <= -0.1]))
 # These sectors fell much more than SPY for the following month after the first
 # taper announcement
 charts.PerformanceSummary(tmp.ret[, c(worst_names, "SPY.Adjusted")], 
-                          legend.loc="bottomleft", legend.cex=0.4,
+                          legend.loc=NULL,
                           main="Sector Performance\n2013-05-21 to 2013-06-21")
 
 # Top 10 holdings of each ETF

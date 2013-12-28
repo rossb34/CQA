@@ -30,7 +30,7 @@ N <- 140
 # years of data for calculating the momentum indicators
 trailingPeriods <- 1260
 
-btPriceToEMA <- backtestMomentum(prices=prices, 
+btPriceToEMA <- backtestMomentumLS(prices=prices, 
                                  trainingPeriods=trainingPeriods, 
                                  trailingPeriods=trailingPeriods, 
                                  rebalanceFrequency=rebalanceFrequency, 
@@ -46,7 +46,7 @@ retPriceToEMA <- portfolioRebalancingReturns(R=returns, weights=btPriceToEMA)
 print(paste("Completed riceToEMA backtest at", Sys.time()))
 
 
-btPriceToHILO <- backtestMomentum(prices=prices, 
+btPriceToHILO <- backtestMomentumLS(prices=prices, 
                                   trainingPeriods=trainingPeriods, 
                                   trailingPeriods=trailingPeriods, 
                                   rebalanceFrequency=rebalanceFrequency, 
@@ -62,7 +62,7 @@ retPriceToHILO <- portfolioRebalancingReturns(R=returns, weights=btPriceToHILO)
 
 print(paste("Completed riceToHILO backtest at", Sys.time()))
 
-btemaMom <- backtestMomentum(prices=prices, 
+btemaMom <- backtestMomentumLS(prices=prices, 
                              trainingPeriods=trainingPeriods, 
                              trailingPeriods=trailingPeriods, 
                              rebalanceFrequency=rebalanceFrequency, 
@@ -78,7 +78,7 @@ retemaMom <- portfolioRebalancingReturns(R=returns, weights=btemaMom)
 
 print(paste("Completed emaMomentum backtest at", Sys.time()))
 
-btsimpleStrength <- backtestMomentum(prices=prices, 
+btsimpleStrength <- backtestMomentumLS(prices=prices, 
                                      trainingPeriods=trainingPeriods, 
                                      trailingPeriods=trailingPeriods, 
                                      rebalanceFrequency=rebalanceFrequency, 
