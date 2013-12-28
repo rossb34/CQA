@@ -359,3 +359,6 @@ for(i in 1:length(pairs)){
 }
 
 names(backtest_out) <- pairs_names
+
+table.ret <- lapply(backtest_out, function(x) table.AnnualizedReturns(x$ret$total))
+table.ret
