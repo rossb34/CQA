@@ -84,12 +84,26 @@ isStationaryURDF <- function(x,
   return(out)
 }
 
-# Phillips & Ouliaris Cointegration Test
-testCointPO <- function(x, 
-                        conf_level=c("10pct", "5pct", "1pct"), 
-                        demean=c("none", "constant", "trend"), 
-                        lag=c("short", "long"), 
-                        type=c("Pz", "Pu")){
+#' Phillips & Ouliaris Cointegration Test
+#' 
+#' Test if a price series is cointegrated using the Phillips & Ouliaris Cointegration Test.
+#' Wrapper around urca::ca.po to return TRUE if the time series is likely  
+#' cointegrated, FALSE otherwise.
+#' 
+#' H0: The time series are not cointegrated
+#' 
+#' @param x Time series of prices
+#' @param conf_level confidence level to reject H0
+#' @param demen either 'none', 'constant', or 'trend'
+#' @param type Test type, either 'Pz' or 'Pu'
+#' @param lag Lag type, either 'short' or 'long'
+#' @author Ross Bennett
+#' @export
+isCointegratedPO <- function(x, 
+                             conf_level=c("10pct", "5pct", "1pct"), 
+                             demean=c("none", "constant", "trend"), 
+                             lag=c("short", "long"), 
+                             type=c("Pz", "Pu")){
   if(ncol(x) > 2) stop("Only test pairs of assets")
   # Match the arguments
   conf_level <- match.arg(conf_level)
@@ -116,12 +130,12 @@ testCointPO <- function(x,
 }
 
 # Johansen Procedure
-testCointJO <- function(x, 
-                        conf_level=c("10pct", "5pct", "1pct"),
-                        type=c("eigen", "trace"), 
-                        ecdet=c("none", "const", "trend"), 
-                        K=2, 
-                        spec=c("longrun", "transitory")){
+isCointegratedJO <- function(x, 
+                             conf_level=c("10pct", "5pct", "1pct"),
+                             type=c("eigen", "trace"), 
+                             ecdet=c("none", "const", "trend"), 
+                             K=2, 
+                             spec=c("longrun", "transitory")){
   # Match the arguments
   conf_level <- match.arg(conf_level)
   type <- match.arg(type)
