@@ -22,12 +22,12 @@ mcb <- mcb[mcb[,"Ticker"] %in% betas[,"Symbol"],]
 # symbols <- as.character(mcb[,"Ticker"])
 
 symbols <- c("BAC", "C", "JPM", "KEY", "PNC", "STI", "TCB", "WFC")
-from <- "2009-12-31"
+startDate <- '2009-01-02'
 
 # Load the symbols
-getSymbols(symbols, from=from)
+getSymbols(symbols, from=startDate, adjust=TRUE)
 
-# Align the symbols
+# Align symbols
 # TODO
 
 # Test the combinations of pairs for for mean reverting spreads
@@ -37,8 +37,11 @@ for(i in 1:length(symbols)){
   while(j <= length(symbols)){
     if(j != i){
       print(paste("Testing", symbols[i], symbols[j]))
-      sym1 <- Cl(get(symbols[i]))
-      sym2 <- Cl(get(symbols[j]))
+      sym1 <- get(symbols[i])
+      sym1 <- Cl(sym1)
+      
+      sym2 <- get(symbols[j])
+      sym2 <- Cl(sym2)
       
       tmp <- estimateParametersHistorically(sym1, sym2, 120, "ols")
       # Test if the spread is stationary
@@ -68,7 +71,7 @@ backtest_out <- list()
 for(i in 1:length(pairs)){
   backtest_out[[i]] <- list()
   
-  suppressWarnings(rm("order_book.pair1",pos=.strategy))
+  suppressWarnings(rm("order_book.pair1", pos=.strategy))
   suppressWarnings(rm("account.pairs", "portfolio.pair1", pos=.blotter))
   suppressWarnings(rm("initDate", "endDate", "startDate", "initEq", "SD", "N", 
                       "portfolio1.st", "account.st", "pairStrat", "out1"))
@@ -88,7 +91,7 @@ for(i in 1:length(pairs)){
   startDate <- '2009-01-02'
   endDate <- Sys.Date()
   
-  getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE)
+  # getSymbols(c(symb1, symb2), from=startDate, to=endDate, adjust=TRUE)
   
   # The following function is used to make sure the timestamps of all symbols are 
   # the same deletes rows where one of the stocks is missing data
@@ -117,7 +120,6 @@ for(i in 1:length(pairs)){
   stock(symb2, currency="USD", multiplier=1)
   
   ##### Initial Parameters #####
-  
   # Initial Dates
   initDate <- '2009-01-01'
   

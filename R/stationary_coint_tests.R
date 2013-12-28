@@ -60,7 +60,7 @@ isStationaryURDF <- function(x,
   # Match the args
   conf_level <- match.arg(conf_level)
   type <- match.arg(type)
-  selectlags <- match.arg(type)
+  selectlags <- match.arg(selectlags)
   
   x <- na.omit(x)
   
