@@ -375,5 +375,3 @@ annualized.return <- unlist(lapply(table.ret, function(x) x[1,]))
 
 sort(annualized.return, decreasing=TRUE)[1:10]
 sort(sharpe.ratios, decreasing=TRUE)[1:10]
-
-charts.PerformanceSummary(backtest_out$FCNCAFULT$ret$total)
