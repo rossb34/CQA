@@ -302,9 +302,6 @@ for(i in 1:length(pairs)){
   # Create entry and exit rules for longs  and for shorts. Both symbols will get 
   # the same buy/sell signals, but osMaxPos will reverse those for the second 
   # symbol.
-  # orderqty's are bigger than PosLimits allow. osMaxPos will adjust the orderqty 
-  # down to 1/3 the max allowed. (1/3 is because we are using 3 levels in 
-  # PosLimit)
   pairStrat <- add.rule(strategy=pairStrat, name='ruleSignal', 
                         arguments=list(sigcol="cross.dn", sigval=TRUE, 
                                        orderqty=1e6, ordertype='market', 
@@ -364,3 +361,109 @@ names(backtest_out) <- pairs_names
 
 table.ret <- lapply(backtest_out, function(x) table.AnnualizedReturns(x$ret$total))
 table.ret
+
+spreadSignals <- function(spread, hedge_ratio, n=60, sd=2){
+  tmpTA <- BBands(spread, n=n, maType="EMA", sd=sd)
+  tmp <- cbind(spread, hedge_ratio, tmpTA)
+  sig <- vector("numeric", nrow(tmp))
+  for(i in 1:length(sig)){
+    if(!is.na(tmp$dn[i])){
+      if(tmp$spread[i] > tmp$up[i]){
+        sig[i] <- 1
+      }
+      if(tmp$spread[i] < tmp$dn[i]){
+        sig[i] <- -1
+      }
+    }
+  }
+  cbind(tmp, sig)
+}
+
+plotSpread <- function(object, main="Spread"){
+  plot(object$spread, main=main)
+  lines(object$dn, col="red")
+  lines(object$up, col="red")
+  lines(object$mavg)
+}
+
+spreadOrders <- function(P1, P2, hedge_ratio, market_value=500000, order_side=c("long", "short")){
+  order_side <- match.arg(order_side)
+  tmp_sym1_shares <- floor(min(market_value / P1, market_value / (hedge_ratio * P2)))
+  tmp_sym2_shares <- floor(tmp_sym1_shares * hedge_ratio)
+  
+  if(order_side == "long"){
+    # we are buying symbol 1 and shorting symbol 2
+    sym1_shares <- tmp_sym1_shares
+    sym2_shares <- - tmp_sym2_shares
+  }
+  if(order_side == "short"){
+    # we are selling symbol 1 and buying symbol 2
+    sym1_shares <- - tmp_sym1_shares
+    sym2_shares <- tmp_sym2_shares
+  }
+  # market value
+  sym1_mv <- sym1_shares * P1
+  sym2_mv <- sym2_shares * P2
+  
+  # put in list
+  sym1 <- list()
+  sym1$shares <- sym1_shares
+  sym1$market_value <- sym1_mv
+  
+  sym2 <- list()
+  sym2$shares <- sym2_shares
+  sym2$market_value <- sym2_mv
+  list(symbol1=sym1, symbol2=sym2)
+}
+
+# JPM-STI
+# PNC-TCB
+# PNC-WFC
+# STI-TCB
+
+# chartSeries(out$JPMSTI$data$spread)
+# addBBands(n=60, maType="EMA", sd=2)
+
+head(out$JPMSTI$data)
+
+# Sell signal: spread is above upper BBand and crosses below.
+# sell x shares of symbol 1 and buy hedge_ratio * x_shares of symbol 2
+
+# Buy signal: spread is below lower BBand and crosses above
+# buy x shares of symbol 1 and sell hedge_ratio * x_shares of symbol 2
+
+JPMSTI <- spreadSignals(out$JPMSTI$data$spread, out$JPMSTI$data$hedge_ratio)
+plotSpread(tail(JPMSTI, 10), main="JPMSTI")
+# buy the JPM-STI spread
+# buy JPM, sell STI
+as.numeric(last(JPMSTI[, "hedge_ratio"]))
+
+JPM.Price <- 55.73
+STI.Price <- 38.04
+
+spreadOrders(JPM.Price, STI.Price, as.numeric(last(JPMSTI[, "hedge_ratio"])), 350000)
+
+PNCTCB <- spreadSignals(out$PNCTCB$data$spread, out$PNCTCB$data$hedge_ratio)
+plotSpread(tail(PNCTCB, 10), main="PNCTCB")
+# sell the PNC-TCB spread
+# sell PNC, buy TCB
+as.numeric(last(PNCTCB[, "hedge_ratio"]))
+
+PNC.Price <- 81.23
+TCB.Price <- 16.45
+
+spreadOrders(PNC.Price, TCB.Price, as.numeric(last(PNCTCB[, "hedge_ratio"])), 350000, "short")
+
+PNCWFC <- spreadSignals(out$PNCWFC$data$spread, out$PNCWFC$data$hedge_ratio)
+plotSpread(tail(PNCWFC, 10), main="PNCWFC")
+# sell the PNC-WFC spread
+# sell PNC, buy WFC
+as.numeric(last(PNCWFC[, "hedge_ratio"]))
+
+WFC.Price <- 45.96
+
+spreadOrders(PNC.Price, WFC.Price, as.numeric(last(PNCWFC[, "hedge_ratio"])), 250000, "short")
+
+
+STITCB <- spreadSignals(out$STITCB$data$spread, out$STITCB$data$hedge_ratio)
+plotSpread(tail(STITCB, 10), main="STITCB")
